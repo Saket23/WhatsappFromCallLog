@@ -1,21 +1,68 @@
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Image, PermissionsAndroid} from 'react-native';
-import styled from 'styled-components/native';
+import {PermissionsAndroid, FlatList, Image} from 'react-native';
+import {WebView} from 'react-native-webview';
 import CallLogs from 'react-native-call-log';
+
 import {storeCallLog} from '../actions/storeCallLogs';
-import {SingleCallLog} from './styles';
-
-const StyledView = styled.View`
-  background-color: green;
-`;
-
-const StyledText = styled.Text`
-  color: red;
-`;
+import SingleCallLog from './SingleCalLog';
+import ConfirmModal from './ConfirmModal';
+import {ifCountryCodeIsAdded} from '../utils/verify';
+import {
+  StyledSafeAreaView,
+  StyledView,
+  StyledText,
+  StyledTextBack,
+  Back,
+} from './styles';
 
 class Container extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      openWebView: false,
+      number: '1',
+      modalVisible: false,
+      countryCode: '91',
+    };
+  }
+
+  onCallLogPress = d => e => {
+    if (ifCountryCodeIsAdded(d.phoneNumber)) {
+      this.setState({openWebView: true, number: d.phoneNumber});
+    } else {
+      this.setState({modalVisible: true, number: d.phoneNumber});
+    }
+  };
+
+  handleOnClickBack = () => {
+    this.setState({openWebView: false});
+  };
+
+  onModalClose = () => {
+    this.setState({modalVisible: false, number: 1});
+  };
+
+  onModalConfirm = () => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        openWebView: true,
+        modalVisible: false,
+        number: `+${prevState.countryCode}${prevState.number}`,
+      };
+    });
+  };
+
+  onChangeCountryCode = e => {
+    this.setState({countryCode: e.target.value});
+  };
+
+  onChangeNumber = e => {
+    this.setState({number: e.target.value});
+  };
+
   componentDidMount() {
     const {storeCallLog} = this.props;
     (async () => {
@@ -42,33 +89,62 @@ class Container extends PureComponent {
       }
     })();
   }
+
   render() {
     const {data} = this.props;
+    const {openWebView, modalVisible, countryCode, number} = this.state;
     console.log(data);
     return (
-      <StyledView>
-        {data.length === 0 ? (
-          <StyledText>No Call Log To show</StyledText>
-        ) : (
-          data.map((d, i) => {
-            let path;
-            if (d.type === 'OUTGOING') {
-              path = require(`../icons/outgoing.png`);
-            } else if (d.type === 'INCOMING') {
-              path = require(`../icons/incoming.png`);
-            } else if (d.type === 'MISSED') {
-              path = require(`../icons/missed-call.png`);
-            }
-            return (
-              <SingleCallLog key={i}>
-                <StyledText>{d.name ? d.name : d.phoneNumber}</StyledText>
-                <StyledText>{d.name ? d.phoneNumber : ''}</StyledText>
-                <Image source={path} />
-              </SingleCallLog>
-            );
-          })
+      <StyledSafeAreaView>
+        {!openWebView && (
+          <StyledView>
+            {data.length === 0 ? (
+              <StyledText>No Call Log To show</StyledText>
+            ) : (
+              <>
+                <StyledText>Touch on call log to open WhatsApp</StyledText>
+                <FlatList
+                  data={data}
+                  renderItem={({item}) => {
+                    return (
+                      <SingleCallLog
+                        data={item}
+                        onCallLogPress={this.onCallLogPress}
+                      />
+                    );
+                  }}
+                  extraData={data}
+                  keyExtractor={(item, index) => `${index}`}
+                />
+              </>
+            )}
+          </StyledView>
         )}
-      </StyledView>
+        {modalVisible && (
+          <ConfirmModal
+            modalVisible={modalVisible}
+            countryCode={countryCode}
+            number={number}
+            onClose={this.onModalClose}
+            onChangeCountryCode={this.onChangeCountryCode}
+            onChangeNumber={this.onChangeNumber}
+            onConfirm={this.onModalConfirm}
+          />
+        )}
+        {openWebView && number !== '1' && (
+          <>
+            <Back onPress={this.handleOnClickBack}>
+              <Image source={require(`../icons/back.png`)} />
+              <StyledTextBack>Back</StyledTextBack>
+            </Back>
+            <WebView
+              source={{
+                uri: `https://api.whatsapp.com/send?phone=${number}`,
+              }}
+            />
+          </>
+        )}
+      </StyledSafeAreaView>
     );
   }
 }
