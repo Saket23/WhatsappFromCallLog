@@ -41,9 +41,14 @@ const ConfirmModal = ({
               <TextInputStyle
                 onChangeText={onChangeCountryCode}
                 value={countryCode}
+                keyboardType="numeric"
               />
               <SignText>-</SignText>
-              <TextInputStyle onChangeText={onChangeNumber} value={number} />
+              <TextInputStyle
+                onChangeText={onChangeNumber}
+                value={number}
+                keyboardType="numeric"
+              />
             </Inputs>
             <TouchableHighlightStyle onPress={onConfirm}>
               <ButtonText>Confirm</ButtonText>

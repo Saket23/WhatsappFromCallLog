@@ -51,16 +51,17 @@ class Container extends PureComponent {
         openWebView: true,
         modalVisible: false,
         number: `+${prevState.countryCode}${prevState.number}`,
+        countryCode: '91',
       };
     });
   };
 
-  onChangeCountryCode = e => {
-    this.setState({countryCode: e.target.value});
+  onChangeCountryCode = v => {
+    this.setState({countryCode: v});
   };
 
-  onChangeNumber = e => {
-    this.setState({number: e.target.value});
+  onChangeNumber = v => {
+    this.setState({number: v});
   };
 
   componentDidMount() {
@@ -78,7 +79,7 @@ class Container extends PureComponent {
           },
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          CallLogs.load(25).then(c => {
+          CallLogs.load(50).then(c => {
             storeCallLog(c);
           });
         } else {
@@ -93,7 +94,6 @@ class Container extends PureComponent {
   render() {
     const {data} = this.props;
     const {openWebView, modalVisible, countryCode, number} = this.state;
-    console.log(data);
     return (
       <StyledSafeAreaView>
         {!openWebView && (
