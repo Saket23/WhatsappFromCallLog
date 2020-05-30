@@ -5,9 +5,10 @@ import {Image, PermissionsAndroid} from 'react-native';
 import styled from 'styled-components/native';
 import CallLogs from 'react-native-call-log';
 import {storeCallLog} from '../actions/storeCallLogs';
+import {SingleCallLog} from './styles';
 
 const StyledView = styled.View`
-  background-color: blue;
+  background-color: green;
 `;
 
 const StyledText = styled.Text`
@@ -59,11 +60,11 @@ class Container extends PureComponent {
               path = require(`../icons/missed-call.png`);
             }
             return (
-              <StyledView key={i}>
+              <SingleCallLog key={i}>
                 <StyledText>{d.name ? d.name : d.phoneNumber}</StyledText>
                 <StyledText>{d.name ? d.phoneNumber : ''}</StyledText>
                 <Image source={path} />
-              </StyledView>
+              </SingleCallLog>
             );
           })
         )}
