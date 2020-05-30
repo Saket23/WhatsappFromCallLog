@@ -28,6 +28,7 @@ function SingleCallLog({data, onCallLogPress}) {
             {data.name ? data.name : data.phoneNumber}
           </StyledHeader>
           <StyledText>{data.name ? data.phoneNumber : ''}</StyledText>
+          <StyledText>{data.dateTime}</StyledText>
         </StyledViewDetails>
       </StyledViewLeft>
       <Image source={require(`../icons/whatsapp.png`)} />

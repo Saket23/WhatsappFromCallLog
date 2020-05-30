@@ -24,9 +24,13 @@ export const StyledHeader = styled.Text`
   font-family: sans-serif-condensed;
 `;
 
-export const StyledText = styled.Text``;
+export const StyledText = styled.Text`
+  color: grey;
+`;
 
-export const StyledViewDetails = styled.View``;
+export const StyledViewDetails = styled.View`
+  padding: 5px 0px;
+`;
 
 export const StyledViewLeft = styled.View`
   display: flex;
